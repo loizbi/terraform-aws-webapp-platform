@@ -1,5 +1,5 @@
 
-name: "Reusable: Terraform Apply"
+name: "Reusable: Terraform Apply and WebApp Deploy"
 
 on:
   workflow_call:

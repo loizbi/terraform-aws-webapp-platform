@@ -1,5 +1,5 @@
 
-name: "Terraform: Destroy (Manual)"
+name: "Terraform: Production Destroy (Manual)"
 
 on:
   workflow_dispatch:

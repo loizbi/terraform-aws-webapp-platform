@@ -1,5 +1,5 @@
 
-name: "Terraform: Prod Apply"
+name: "Terraform: Production Apply and WebApp Deploy"
 
 on:
   push:

@@ -1,5 +1,5 @@
 
-name: "Terraform: Dev Plan"
+name: "Terraform: Validation Plan"
 
 on:
   push:
@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 jobs:
-  terraform-validation:
-    uses: ./.github/workflows/reusable-terraform-validation.yml
+  terraform-plan:
+    uses: ./.github/workflows/reusable-terraform-plan.yml
     with: 
       working_directory: ec2-webapp-example
       var_file: env.tfvars

@@ -51,7 +51,7 @@ The workflows use GitHub OIDC, so AWS access keys are not required. The role tru
 
 Navigate to `ec2-webapp-example` and update `backend.tf` with your state bucket. Set the values in `env.tfvars`: `environment`, `team`, `domain`, `aws_region`, `vpc_id`, `subnet_id`, `ec2_ami_id`, `ec2_name`, `ec2_instance_type`, `ec2_ssh_key_pair`, and `ec2_allowed_ips`. The VPC, subnet, EC2 key pair, and public hosted zone `${environment}.${domain}` must already exist.
 
-In `.github/workflows/terraform-validation.yml` and `terraform-main.yml`, set `working_directory` to `ec2-webapp-example` (or your chosen app directory). The workflows expect `env.tfvars` in that directory. They currently trigger only for changes under `ec2-webapp-example/`. The Ansible workflow temporarily allows SSH from its runner's public IP (`/32`) and revokes that rule afterward. `.gitignore` currently allows `.tfvars` files; commit `env.tfvars` only if it contains no secrets. Keep private keys in GitHub Secrets.
+In `.github/workflows/terraform-plan.yml` and `terraform-apply.yml`, set `working_directory` to `ec2-webapp-example` (or your chosen app directory). The workflows expect `env.tfvars` in that directory. They currently trigger only for changes under `ec2-webapp-example/`. The Ansible workflow temporarily allows SSH from its runner's public IP (`/32`) and revokes that rule afterward. `.gitignore` currently allows `.tfvars` files; commit `env.tfvars` only if it contains no secrets. Keep private keys in GitHub Secrets.
 
 Trivy scans the Terraform configuration for high and critical security findings on `validation` and before deployment on `main`. Findings listed in `.trivyignore` are ignored. Remove an entry from `.trivyignore` when it no longer needs to be suppressed.
 

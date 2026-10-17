@@ -1,5 +1,5 @@
 
-name: "Reusable: Terraform Validate"
+name: "Reusable: Terraform Validation"
 
 on:
   workflow_call:

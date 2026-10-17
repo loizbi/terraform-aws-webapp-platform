@@ -79,7 +79,7 @@ terraform plan -var-file=env.tfvars
 
 ## Push to `validation` and Open a Pull Request
 
-Create and push the development branch:
+Create and push the validation branch:
 
 ```sh
 git checkout -b validation

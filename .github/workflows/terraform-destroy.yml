@@ -1,0 +1,25 @@
+
+name: "Terraform: Destroy WebApp (Manual)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type DESTROY to confirm
+        required: true
+        type: string
+
+# Allow the reusable workflow to use OIDC
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-destroy:
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'DESTROY'
+    uses: ./.github/workflows/reusable-terraform-destroy.yml
+    with:
+      working_directory: ec2-webapp-example
+      var_file: env.tfvars
+      aws_region: eu-west-2
+      debug: false

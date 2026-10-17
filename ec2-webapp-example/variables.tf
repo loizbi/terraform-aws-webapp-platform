@@ -10,6 +10,21 @@ variable "team" {
   type        = string
 }
 
+variable "team_email" {
+  description = "Team email for the EC2 instance"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[^@]+@[^@]+\\.[^@]+$", var.team_email))
+    error_message = "team_email must be a valid email address."
+  }
+}
+
+variable "team_monthly_budget" {
+  description = "Team monthly budget for the EC2 instance"
+  type        = string
+}
+
 variable "domain" {
   description = "Domain name"
   type        = string

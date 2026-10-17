@@ -16,7 +16,9 @@ provider "aws" {
     tags = {
       Environment = var.environment
       Team        = var.team
-      ManagedBy   = "Terraform"
+      TeamEmail   = var.team_email
+      TeamBudget  = var.team_monthly_budget
+      ManagedBy   = "terraform"
     }
   }
 }

@@ -93,3 +93,35 @@ resource "aws_route53_record" "ec2_fqdn" {
   ttl     = 300
   records = [aws_instance.webserver01.public_ip]
 }
+
+# Create a budget for the team
+resource "aws_budgets_budget" "team_monthly" {
+  name         = "team-${var.team}-monthly"
+  budget_type  = "COST"
+  limit_amount = var.team_monthly_budget
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+  
+  # Use the cost_filter argument to filter the budget by the team tag 
+  cost_filter {
+    name   = "TagKeyValue"
+    values = ["user:Team$ ${var.team}"]
+  }
+  
+  # Use the notification argument to send an email when the budget is exceeded 
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 80
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_email_addresses = [var.team_email]
+  }
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 100
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_email_addresses = [var.team_email, "another_email@example.com"]
+  }
+}

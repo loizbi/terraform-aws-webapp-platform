@@ -117,3 +117,9 @@ terraform init
 terraform apply
 terraform destroy
 ```
+
+# FinOps
+## Work in progress 
+- cost allocation friendly tags
+- budget: https://registry.terraform.io/providers/hashicorp/aws/5.0.1/docs/resources/budgets_budget
+- anomaly detection: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor

@@ -6,9 +6,11 @@ module "ec2-simple-instance" {
   # Pass variables to the module
 
   # Environment-specific variables
-  environment = var.environment
-  domain      = var.domain
-  team        = var.team
+  environment           = var.environment
+  domain                = var.domain
+  team                  = var.team
+  team_email            = var.team_email
+  team_monthly_budget   = var.team_monthly_budget
 
   # Resource-specific variables
   aws_region        = var.aws_region

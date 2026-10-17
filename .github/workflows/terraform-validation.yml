@@ -1,0 +1,23 @@
+
+name: "Terraform: Dev Plan"
+
+on:
+  push:
+    branches:
+      - validation
+    paths:
+      - 'ec2-webapp-example/**'
+
+# Allow the reusable workflow to use OIDC
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-validation:
+    uses: ./.github/workflows/reusable-terraform-validation.yml
+    with: 
+      working_directory: ec2-webapp-example
+      var_file: env.tfvars
+      aws_region: eu-west-2
+      debug: false

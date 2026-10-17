@@ -1,0 +1,120 @@
+
+name: "Reusable: Terraform Deploy"
+
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        required: true
+        type: string
+      var_file:
+        required: true
+        type: string
+      aws_region:
+        required: true
+        type: string
+      debug:
+        required: true
+        type: boolean
+
+    secrets:
+      AWS_SSH_PRIVATE_KEY:
+        required: true
+
+env:
+  AWS_ROLE_ARN: ${{ vars.AWS_APPLY_ROLE_ARN }}
+
+# Allow the reusable workflow to use OIDC
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform EC2 Deployment
+    runs-on: ubuntu-24.04
+
+    defaults:
+      run:
+        working-directory: "./${{ inputs.working_directory }}"
+
+    outputs:
+      EC2_PUBLIC_IP: ${{ steps.terraform_output.outputs.EC2_PUBLIC_IP }}
+      EC2_SECURITY_GROUP_ID: ${{ steps.terraform_output.outputs.EC2_SECURITY_GROUP_ID }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy Scan Configuration
+        uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          TRIVY_DISABLE_VEX_NOTICE: true
+        with:
+          tf-vars: ${{ inputs.working_directory }}/${{ inputs.var_file }}
+          scan-ref: ${{ inputs.working_directory }}
+          scan-type: config
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: GitHubActions
+          aws-region: ${{ inputs.aws_region }}
+          mask-aws-account-id: true
+      
+      # Only for debugging purposes
+      - name: Verify AWS credentials
+        if: ${{ inputs.debug }}
+        run: |
+          aws sts get-caller-identity
+          echo "repo=$GITHUB_REPOSITORY"
+          echo "ref=$GITHUB_REF" \
+          echo "sha=$GITHUB_SHA"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      # Only for debugging purposes
+      #- name: Show backend state
+      #  run: terraform state list
+
+      - name: Terraform Format
+        run: terraform fmt
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Apply
+        run: terraform apply --var-file=${{ inputs.var_file }} -auto-approve -input=false
+        
+      - name: Get EC2 Public IP & Security Group ID
+        id: terraform_output
+        run: |
+          EC2_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)
+          EC2_SECURITY_GROUP_ID=$(terraform output -raw ec2_security_group_id)
+
+          echo "EC2_PUBLIC_IP=$EC2_PUBLIC_IP" >> "$GITHUB_OUTPUT"
+          echo "EC2_SECURITY_GROUP_ID=$EC2_SECURITY_GROUP_ID" >> "$GITHUB_OUTPUT"
+
+  ansible:
+    name: Ansible Web Deployment
+    needs: terraform
+
+    uses: ./.github/workflows/reusable-ansible-linux-webapp.yml
+
+    with:
+      target_host: ${{ needs.terraform.outputs.EC2_PUBLIC_IP }}
+      security_group_id: ${{ needs.terraform.outputs.EC2_SECURITY_GROUP_ID }}
+      aws_region: ${{ inputs.aws_region }}
+
+    secrets: inherit

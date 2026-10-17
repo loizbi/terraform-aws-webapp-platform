@@ -7,7 +7,7 @@ Terraform provisions an EC2 web server and Route 53 record. GitHub Actions runs 
 ## Requirements
 
 - AWS account, AWS CLI configured with credentials, Terraform CLI (version requirements are declared in each Terraform configuration), GitHub CLI, and GitHub Actions enabled.
-- An existing VPC, subnet, EC2 key pair, and public Route 53 hosted zone.
+- An existing VPC and public subnet with a route to an Internet Gateway and automatic public IPv4 assignment, an EC2 key pair, and a public Route 53 hosted zone. Route 53 and Ansible use the instance’s public IP.
 
 ## Create the Terraform State Bucket
 
@@ -21,6 +21,8 @@ terraform apply
 Then uncomment the S3 backend block, set it to the bucket name you created, and run `terraform init` again. Confirm migration of the local state to S3 with `terraform state list`.
 
 ## Create the GitHub OIDC Roles
+
+The `validation` plan disables state locking because its role has read-only access to the S3 state bucket. Avoid running a `validation` plan while an apply or destroy is in progress.
 
 GitHub OIDC uses immutable owner and repository IDs. From your repository, get them with:
 
@@ -47,11 +49,11 @@ Open **Settings → Secrets and variables → Actions** in your repository:
 
 The workflows use GitHub OIDC, so AWS access keys are not required. The role trust policies must match this repository and the `validation` and `main` branches.
 
-## Configure the Web App and Workflows
+## Configure the WebApp and Workflows
 
-Navigate to `ec2-webapp-example` and update `backend.tf` with your state bucket. Set the values in `env.tfvars`: `environment`, `team`, `domain`, `aws_region`, `vpc_id`, `subnet_id`, `ec2_ami_id`, `ec2_name`, `ec2_instance_type`, `ec2_ssh_key_pair`, and `ec2_allowed_ips`. The VPC, subnet, EC2 key pair, and public hosted zone `${environment}.${domain}` must already exist.
+Configure `ec2-webapp-example/backend.tf` and `env.tfvars` for your AWS account. `ec2_allowed_ips` controls inbound ICMP, HTTP, and SSH access.
 
-In `.github/workflows/terraform-plan.yml` and `terraform-apply.yml`, set `working_directory` to `ec2-webapp-example` (or your chosen app directory). The workflows expect `env.tfvars` in that directory. They currently trigger only for changes under `ec2-webapp-example/`. The Ansible workflow temporarily allows SSH from its runner's public IP (`/32`) and revokes that rule afterward. `.gitignore` currently allows `.tfvars` files; commit `env.tfvars` only if it contains no secrets. Keep private keys in GitHub Secrets.
+The workflows currently target `ec2-webapp-example` and use `env.tfvars`. If you change those, update the workflow settings. `.tfvars` files are not ignored by default; keep secrets in GitHub Secrets.
 
 Trivy scans the Terraform configuration for high and critical security findings on `validation` and before deployment on `main`. Findings listed in `.trivyignore` are ignored. Remove an entry from `.trivyignore` when it no longer needs to be suppressed.
 
@@ -59,13 +61,9 @@ Trivy scans the Terraform configuration for high and critical security findings 
 
 **AWS permission scope:** The GitHub Actions apply role needs write access to create and delete the infrastructure. This example grants broad EC2 permissions and `iam:PassRole` across AWS resources. `PR approval` controls which workflow changes reach `main`, but does not limit the role’s permissions. Review and narrow the IAM policy for your AWS account before reusing this configuration.
 
-In **Settings → Rules → Rulesets**, create an active branch ruleset targeting `main`. Require a pull request and at least one approval, block force pushes and branch deletion, and limit bypass to trusted administrators. This ensures workflow changes, including removal of the destroy workflow's approval requirement, go through review.
+In **Settings → Rules → Rulesets**, create an active ruleset for `main` that requires a pull request and at least one approval, blocks force pushes and branch deletion, and limits bypass to trusted administrators. The PR author cannot approve their own pull request.
 
-A reviewer with write access must open the pull request and submit an **Approve** review; GitHub will block merging until the required approval is recorded. The PR author cannot approve their own pull request.
-
-Configure required reviewers for the `production` Environment under **Settings → Environments → production**. This approval is required for the manual destroy workflow; normal applies are protected by the required PR approval and `main` branch protection.
-
-After configuring the AWS backend, OIDC roles, repository variables and secrets, and workflow paths, commit and push the changes to GitHub to run the CI/CD workflows.
+Under **Settings → Environments → production**, configure required reviewers to approve the manual destroy workflow. Normal applies are protected by the `main` branch ruleset.
 
 ## Local Validation (Optional)
 Run these from `ec2-webapp-example`:
@@ -88,11 +86,11 @@ git commit -m "Initial deployment configuration"
 git push -u origin validation
 ```
 
-The `validation` push runs Terraform validation and plan. Open a pull request from `validation` to `main`, review it, and merge it. The push to `main` runs Terraform apply and Ansible deployment.
+Open a pull request from `validation` to `main` and merge it after approval.
 
 ## Destroy Production Infrastructure
 
-Run the manual destroy workflow from `main` and type `DESTROY` to confirm. Reviewers configured for the `production` Environment must approve the apply job before Terraform applies the full destroy plan.
+Run the manual destroy workflow from `main` and type `DESTROY` to confirm.
 
 ### Destroy the GitHub OIDC Roles
 Navigate to `bootstraps/roles` and run:

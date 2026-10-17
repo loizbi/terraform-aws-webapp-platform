@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   terraform-deployment:
-    uses: ./.github/workflows/reusable-terraform-deployment.yml
+    uses: ./.github/workflows/reusable-terraform-apply.yml
     with: 
       working_directory: ec2-webapp-example
       var_file: env.tfvars

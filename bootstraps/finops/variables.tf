@@ -8,3 +8,8 @@ variable "finops_email" {
   description = "Email address for FinOps alerts"
   type        = string
 }
+
+variable "aws_account_id" {
+  description = "AWS account ID"
+  type        = string
+}

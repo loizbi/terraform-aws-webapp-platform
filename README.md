@@ -123,3 +123,4 @@ terraform destroy
 - cost allocation friendly tags
 - budget: https://registry.terraform.io/providers/hashicorp/aws/5.0.1/docs/resources/budgets_budget
 - anomaly detection: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor
+- s3 lifecycle

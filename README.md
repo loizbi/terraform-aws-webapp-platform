@@ -124,3 +124,6 @@ terraform destroy
 - budget: https://registry.terraform.io/providers/hashicorp/aws/5.0.1/docs/resources/budgets_budget
 - anomaly detection: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor
 - s3 lifecycle
+
+- In GitHub Actions, you can set this as a variable and pass it as an environment variable to Terraform
+#default_monitor_arn = ""

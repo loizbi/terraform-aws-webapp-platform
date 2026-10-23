@@ -1,3 +1,9 @@
+# Account-specific variables
+variable "default_monitor_arn" {
+  description = "Default Monitor ARN for anomaly detection"
+  type        = string
+}
+
 # Environment-specific variables
 variable "aws_region" {
   description = "AWS region"
@@ -29,7 +35,18 @@ variable "notification_threshold_percentage_2" {
   type        = number
 }
 
-variable "default_monitor_arn" {
-  description = "Default Monitor ARN for anomaly detection"
-  type        = string
+variable "teams" {
+  description = "Team budgets and alert recipients, keyed by the Team tag value"
+  type = map(object({
+    monthly_budget = number
+    email          = string
+  }))
+
+  validation {
+    condition = alltrue([
+      for team in values(var.teams) :
+      can(regex("^[^@]+@[^@]+\\.[^@]+$", team.email))
+    ])
+    error_message = "Each team must have a valid email address."
+  }
 }

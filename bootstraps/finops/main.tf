@@ -27,7 +27,7 @@ data "aws_caller_identity" "current" {}
 # Track total monthly AWS costs for the account running this configuration
 resource "aws_budgets_budget" "finops_account_budget" {
 
-  name         = "FinOps Account Budget"
+  name         = "finops-account-budget"
   account_id   = data.aws_caller_identity.current.account_id
   budget_type  = "COST"
   limit_amount = var.limit_amount_usd
@@ -48,5 +48,39 @@ resource "aws_budgets_budget" "finops_account_budget" {
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = [var.finops_email]
+  }
+}
+
+# Create a budget for each team
+resource "aws_budgets_budget" "team_monthly" {
+  for_each = var.teams
+
+  name         = "team-${each.key}-monthly"
+  budget_type  = "COST"
+  limit_amount = tostring(each.value.monthly_budget)
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  # Use the cost_filter argument to filter the budget by the team tag 
+  cost_filter {
+    name   = "TagKeyValue"
+    values = ["user:Team$ ${each.key}"]
+  }
+  
+  # Use the notification argument to send an email when the budget is exceeded 
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = var.notification_threshold_percentage_1
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_email_addresses = [var.finops_email, each.value.email]
+  }
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = var.notification_threshold_percentage_2
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_email_addresses = [var.finops_email, each.value.email]
   }
 }

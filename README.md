@@ -88,6 +88,16 @@ git push -u origin validation
 
 Open a pull request from `validation` to `main` and merge it after approval.
 
+## Optional: FinOps Monitoring
+
+The FinOps bootstrap creates an account-wide monthly budget and subscribes to the account’s default cost anomaly monitor.
+From `bootstraps/finops`, configure `backend.tf` and `terraform.tfvars`, then run:
+
+```sh
+terraform init
+terraform apply
+```
+
 ## Destroy Production Infrastructure
 
 Run the manual destroy workflow from `main` and type `DESTROY` to confirm.
@@ -123,7 +133,3 @@ terraform destroy
 - cost allocation friendly tags
 - budget: https://registry.terraform.io/providers/hashicorp/aws/5.0.1/docs/resources/budgets_budget
 - anomaly detection: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor
-- s3 lifecycle
-
-- In GitHub Actions, you can set this as a variable and pass it as an environment variable to Terraform
-#default_monitor_arn = ""

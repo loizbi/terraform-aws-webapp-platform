@@ -12,5 +12,4 @@ notification_threshold_percentage_1 = 80
 notification_threshold_percentage_2 = 100
 
 # Don't declare so it will be prompted during terraform apply
-# In GitHub Actions, you can set this as a variable and pass it as an environment variable to Terraform
 #default_monitor_arn = ""

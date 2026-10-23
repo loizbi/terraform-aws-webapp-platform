@@ -1,9 +1,9 @@
 
 # Environment-specific variables
 environment           = "dev"
-domain                = "the-example.com"
-team                  = "the example team"
-team_email            = "example@the-example.com"
+domain                = "loizbi-example.com"
+team                  = "devops"
+team_email            = "example@loizbi-example.com"
 # Approximate EC2 compute cost only: t3.micro at $0.0104/hour, $7.50 per month.
 # Excludes EBS storage, public IPv4, data transfer, and other AWS charges.
 team_monthly_budget   = "10"

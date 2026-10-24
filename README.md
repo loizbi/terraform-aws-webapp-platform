@@ -90,13 +90,15 @@ Open a pull request from `validation` to `main` and merge it after approval.
 
 ## Optional: FinOps Monitoring
 
-The FinOps bootstrap creates an account-wide monthly budget and subscribes to the account’s default cost anomaly monitor.
-From `bootstraps/finops`, configure `backend.tf` and `terraform.tfvars`, then run:
+The FinOps bootstrap creates account and per-team monthly budgets, plus daily cost anomaly alerts. Activate the `Team` cost allocation tag in Billing and Cost Management → Cost allocation tags. Its values must match the keys in `teams`. Configure `backend.tf` and `terraform.tfvars` in `bootstraps/finops`, then run:
 
 ```sh
 terraform init
+terraform plan
 terraform apply
 ```
+
+Terraform prompts for `default_monitor_arn` since it is omitted from `terraform.tfvars`.
 
 ## Destroy Production Infrastructure
 
@@ -127,9 +129,3 @@ terraform init
 terraform apply
 terraform destroy
 ```
-
-# FinOps
-## Work in progress 
-- cost allocation friendly tags
-- budget: https://registry.terraform.io/providers/hashicorp/aws/5.0.1/docs/resources/budgets_budget
-- anomaly detection: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor

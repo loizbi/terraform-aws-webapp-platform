@@ -2,7 +2,7 @@
 #default_monitor_arn = ""
 
 # Global variables
-aws_region   = "eu-central-1"
+aws_region = "eu-central-1"
 
 # Environment-specific variables
 finops_email = "finops@loizbi-example.com"
@@ -11,7 +11,7 @@ finops_email = "finops@loizbi-example.com"
 anomaly_threshold_usd = 5
 
 # Dollar value threshold for triggering budget notifications
-limit_amount_usd = 20
+limit_amount_usd = 40
 
 # Percentage value threshold for triggering budget notifications
 notification_threshold_percentage_1 = 80
@@ -20,7 +20,7 @@ notification_threshold_percentage_2 = 100
 # Teams
 teams = {
   devops = {
-    monthly_budget = 10
+    monthly_budget = 20
     email          = "devops@loizbi-example.com"
   }
   platform = {

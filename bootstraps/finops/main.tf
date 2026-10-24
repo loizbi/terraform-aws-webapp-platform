@@ -14,7 +14,7 @@ resource "aws_ce_anomaly_subscription" "alerts" {
   # Alert when an anomaly's total impact reaches this USD threshold
   threshold_expression {
     dimension {
-      key = "ANOMALY_TOTAL_IMPACT_ABSOLUTE"
+      key           = "ANOMALY_TOTAL_IMPACT_ABSOLUTE"
       values        = [var.anomaly_threshold_usd]
       match_options = ["GREATER_THAN_OR_EQUAL"]
     }
@@ -55,6 +55,11 @@ resource "aws_budgets_budget" "finops_account_budget" {
 resource "aws_budgets_budget" "team_monthly" {
   for_each = var.teams
 
+  # Tag each team's budget 
+  tags = {
+    Team = each.key
+  }
+
   name         = "team-${each.key}-monthly"
   budget_type  = "COST"
   limit_amount = tostring(each.value.monthly_budget)
@@ -64,9 +69,9 @@ resource "aws_budgets_budget" "team_monthly" {
   # Use the cost_filter argument to filter the budget by the team tag 
   cost_filter {
     name   = "TagKeyValue"
-    values = ["user:Team$ ${each.key}"]
+    values = [format("user:Team$%s", each.key)]
   }
-  
+
   # Use the notification argument to send an email when the budget is exceeded 
   notification {
     comparison_operator        = "GREATER_THAN"
@@ -80,7 +85,7 @@ resource "aws_budgets_budget" "team_monthly" {
     comparison_operator        = "GREATER_THAN"
     threshold                  = var.notification_threshold_percentage_2
     threshold_type             = "PERCENTAGE"
-    notification_type          = "FORECASTED"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = [var.finops_email, each.value.email]
   }
 }

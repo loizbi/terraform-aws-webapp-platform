@@ -11,7 +11,6 @@ module "ec2-simple-instance" {
   team                  = var.team
 
   # Resource-specific variables
-  aws_region        = var.aws_region
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
   ec2_ami_id        = var.ec2_ami_id

@@ -1,8 +1,10 @@
 
 # Environment-specific variables
-environment = "dev"
-domain      = "the-example.com"
-team        = "The Example Team"
+environment           = "dev"
+domain                = "loizbi-example.com"
+team                  = "devops"
+# Approximate EC2 compute cost only: t3.micro at $0.0104/hour, $7.50 per month.
+# Excludes EBS storage, public IPv4, data transfer, and other AWS charges.
 
 # Resource-specific variables
 aws_region        = "eu-west-2"
@@ -18,3 +20,5 @@ ec2_allowed_ips = [
   "1.1.1.1/32",
   "2.2.2.2/32"
 ]
+
+# Forced run

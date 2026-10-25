@@ -16,7 +16,7 @@ provider "aws" {
     tags = {
       Environment = var.environment
       Team        = var.team
-      ManagedBy   = "Terraform"
+      ManagedBy   = "terraform"
     }
   }
 }

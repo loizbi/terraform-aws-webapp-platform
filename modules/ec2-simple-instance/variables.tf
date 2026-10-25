@@ -14,11 +14,6 @@ variable "domain" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region where resources will be created"
-  type        = string
-}
-
 variable "vpc_id" {
   description = "VPC ID where the EC2 instance will be launched"
   type        = string

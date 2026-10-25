@@ -88,6 +88,18 @@ git push -u origin validation
 
 Open a pull request from `validation` to `main` and merge it after approval.
 
+## Optional: FinOps Monitoring
+
+The FinOps bootstrap creates account and per-team monthly budgets, plus daily cost anomaly alerts. Activate the `Team` cost allocation tag in Billing and Cost Management → Cost allocation tags. Its values must match the keys in `teams`. Configure `backend.tf` and `terraform.tfvars` in `bootstraps/finops`, then run:
+
+```sh
+terraform init
+terraform plan
+terraform apply
+```
+
+Terraform prompts for `default_monitor_arn` since it is omitted from `terraform.tfvars`.
+
 ## Destroy Production Infrastructure
 
 Run the manual destroy workflow from `main` and type `DESTROY` to confirm.

@@ -24,3 +24,5 @@ ec2_allowed_ips = [
   "1.1.1.1/32",
   "2.2.2.2/32"
 ]
+
+# Force redeployment

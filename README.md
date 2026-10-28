@@ -1,6 +1,6 @@
 # Terraform AWS Web App Platform
 
-Terraform provisions the specified number of EC2 web servers and a Route 53 record for each instance using the `ec2-simple-instance` module. GitHub Actions runs a plan on the `validation` branch and applies on the `main` branch when `ec2-webapp-example/**` changes. Ansible installs and configures Nginx.
+Terraform provisions the specified number of EC2 web servers and a Route 53 record for each instance using the `ec2-simple-instance` module. GitHub Actions runs a plan on the `validation` branch and when `ec2-webapp-example/**` changes reach the `main` branch, it creates a saved plan and waits for approval in the `production` environment before applying it. Ansible installs and configures Nginx.
 
 The bootstraps are managed independently and their configurations create the resources needed to manage and deploy the application: an S3 bucket for Terraform state and GitHub OIDC roles for Actions. Run them before deploying the app. FinOps monitoring is optional and configured separately.
 
@@ -51,7 +51,7 @@ Open **Settings → Secrets and variables → Actions** in your repository:
 - GitHub Actions debug logging is off by default. To enable it temporarily, add the `ACTIONS_STEP_DEBUG` secret with value `true`; remove it or set it to `false` when done.
 - Under **Secrets**, add `AWS_SSH_PRIVATE_KEY` with the private SSH key matching your EC2 key pair.
 
-The workflows use GitHub OIDC, so AWS access keys are not required. The role trust policies must match this repository and the `validation` and `main` branches.
+The workflows use GitHub OIDC, so AWS access keys are not required. The role trust policies must match this repository, the `validation` and `main` branches, and the `production` environment.
 
 ## Configure the WebApp and Workflows
 
@@ -67,7 +67,7 @@ Trivy scans the Terraform configuration for high and critical security findings 
 
 In **Settings → Rules → Rulesets**, create an active ruleset for `main` that requires a pull request and at least one approval, blocks force pushes and branch deletion, and limits bypass to trusted administrators. The PR author cannot approve their own pull request.
 
-Under **Settings → Environments → production**, configure required reviewers to approve the manual destroy workflow. Normal applies are protected by the `main` branch ruleset.
+Under **Settings → Environments → production**, configure required reviewers to approve both the `apply` and `manual destroy` jobs after their plans are generated. The `main` branch ruleset controls which changes can reach `main`.
 
 ## Local Validation (Optional)
 Run these from `ec2-webapp-example`:
@@ -106,7 +106,7 @@ Terraform prompts for `default_monitor_arn` since it is omitted from `terraform.
 
 ## Destroy Production Infrastructure
 
-Run the manual destroy workflow from `main` and type `DESTROY` to confirm.
+Run the `manual` destroy workflow from `main` and type `DESTROY` to confirm. Review the generated destroy plan, then approve the job in the `production` environment.
 
 ### Destroy the GitHub OIDC Roles
 Navigate to `bootstraps/roles` and run:

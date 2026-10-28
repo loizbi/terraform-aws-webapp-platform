@@ -63,7 +63,7 @@ jobs:
         run: |
           aws sts get-caller-identity
           echo "repo=$GITHUB_REPOSITORY"
-          echo "ref=$GITHUB_REF" \
+          echo "ref=$GITHUB_REF"
           echo "sha=$GITHUB_SHA"
 
       - name: Setup Terraform
@@ -90,7 +90,7 @@ jobs:
       - name: Upload Destroy Plan
         uses: actions/upload-artifact@v4
         with:
-          name: terraform-destroy-plan
+          name: terraform-destroy-plan-${{ github.run_id }}
           path: ${{ inputs.working_directory }}/destroy.tfplan
           retention-days: 1
 
@@ -126,7 +126,7 @@ jobs:
       - name: Download Destroy Plan
         uses: actions/download-artifact@v4
         with:
-          name: terraform-destroy-plan
+          name: terraform-destroy-plan-${{ github.run_id }}
           path: ${{ inputs.working_directory }}
 
       - name: Terraform Apply

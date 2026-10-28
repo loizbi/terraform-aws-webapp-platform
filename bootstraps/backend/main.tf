@@ -4,14 +4,14 @@ terraform {
   ## Initialize Terraform to copy existing state to the new backend - terraform init
   ## Verify - terraform state list
   #############################################################
-   #backend "s3" {
-   #  bucket         = "terraform-state-bucket-example-10.2026"
-   #  key            = "bootstrap/terraform.tfstate"
-   #  region         = "eu-central-1"
-   #  use_lockfile   = true
-   #  encrypt        = true
-   #}
-  
+  #backend "s3" {
+  #  bucket         = "terraform-state-bucket-example-10.2026"
+  #  key            = "bootstrap/terraform.tfstate"
+  #  region         = "eu-central-1"
+  #  use_lockfile   = true
+  #  encrypt        = true
+  #}
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -29,9 +29,9 @@ resource "aws_s3_bucket" "terraform_state" {
   bucket        = "terraform-state-bucket-example-10.2026"
   force_destroy = false
 
-   lifecycle {
+  lifecycle {
     prevent_destroy = true
-  }  
+  }
 }
 
 # Enable versioning for the S3 bucket
@@ -44,7 +44,7 @@ resource "aws_s3_bucket_versioning" "terraform_bucket_versioning" {
 
 # Enable server-side encryption for the S3 bucket
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_crypto_conf" {
-  bucket        = aws_s3_bucket.terraform_state.bucket 
+  bucket = aws_s3_bucket.terraform_state.bucket
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"

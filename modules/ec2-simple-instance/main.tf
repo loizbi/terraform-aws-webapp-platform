@@ -1,36 +1,41 @@
 
 # Create a simple EC2 instance with a security group and a Route53 record
-resource "aws_instance" "webserver01" {
+resource "aws_instance" "webserver" {
+  count = var.ec2_instance_count
+
   ami           = var.ec2_ami_id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_ssh_key_pair
   vpc_security_group_ids = [
-    aws_security_group.ec2_security_group.id
+    aws_security_group.ec2_security_group[count.index].id
   ]
-  subnet_id = var.subnet_id
   
+subnet_id = var.subnet_ids[count.index % length(var.subnet_ids)]
+
   # Enable encryption for the root block device
   root_block_device {
     encrypted = true
   }
-  
+
   # Enable IMDSv2 for the instance
   metadata_options {
-  http_tokens = "required"
+    http_tokens = "required"
   }
-  
+
   # Use the user_data_replace_on_change argument to force a replacement of the instance when the user data changes
   user_data_replace_on_change = true
-  
+
   # Tag the instance with the Name tag  
   tags = {
-    Name        = var.ec2_name
+    Name = "${var.ec2_name}-${count.index + 1}"
   }
 }
 
 # Create a security group for the EC2 instance
 resource "aws_security_group" "ec2_security_group" {
-  name   = "${var.ec2_name}-sg"
+  count = var.ec2_instance_count
+
+  name   = "${var.ec2_name}-sg-${count.index + 1}"
   vpc_id = var.vpc_id
 
   # Use the create_before_destroy lifecycle argument to ensure that the security group is created before the instance is destroyed 
@@ -69,10 +74,10 @@ resource "aws_security_group" "ec2_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "All Outbound access"
   }
-  
+
   # Tag the security group with the Name tag
   tags = {
-    Name        = "${var.ec2_name}-sg"
+    Name = "${var.ec2_name}-sg-${count.index + 1}"
   }
 
 }
@@ -85,11 +90,12 @@ data "aws_route53_zone" "existing_zone" {
 
 # Create a Route53 record for the EC2 instance 
 resource "aws_route53_record" "ec2_fqdn" {
-  #zone_id = aws_route53_zone.existing_zone.zone_id
-  # This will use the existing zone
+  count = var.ec2_instance_count
+
+  # Use the existing zone
   zone_id = data.aws_route53_zone.existing_zone.zone_id
-  name    = var.ec2_name
+  name    = "${var.ec2_name}-${count.index + 1}"
   type    = "A"
   ttl     = 300
-  records = [aws_instance.webserver01.public_ip]
+  records = [aws_instance.webserver[count.index].public_ip]
 }

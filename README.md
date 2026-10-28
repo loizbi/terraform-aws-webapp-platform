@@ -1,13 +1,17 @@
 # Terraform AWS Web App Platform
 
-Terraform provisions an EC2 web server and Route 53 record. GitHub Actions runs a plan on `validation` and applies on `main` when `ec2-webapp-example/` changes. Ansible installs and configures Nginx.
+Terraform provisions the specified number of EC2 web servers and a Route 53 record for each instance using the `ec2-simple-instance` module. GitHub Actions runs a plan on the `validation` branch and applies on the `main` branch when `ec2-webapp-example/**` changes. Ansible installs and configures Nginx.
+
+The bootstraps are managed independently and their configurations create the resources needed to manage and deploy the application: an S3 bucket for Terraform state and GitHub OIDC roles for Actions. Run them before deploying the app. FinOps monitoring is optional and configured separately.
 
 **Technologies:** Terraform · AWS (EC2, S3, Route 53, IAM/OIDC) · GitHub Actions · Ansible · Nginx
 
 ## Requirements
 
 - AWS account, AWS CLI configured with credentials, Terraform CLI (version requirements are declared in each Terraform configuration), GitHub CLI, and GitHub Actions enabled.
-- An existing VPC and public subnet with a route to an Internet Gateway and automatic public IPv4 assignment, an EC2 key pair, and a public Route 53 hosted zone. Route 53 and Ansible use the instance’s public IP.
+- An existing VPC and public subnets in that VPC with a route to an Internet Gateway and automatic public IPv4 assignment, an EC2 key pair, and a public Route 53 hosted zone. Route 53 and Ansible use each instance’s public IP address.
+- For multi-AZ placement, provide one subnet per Availability Zone. 
+- The example cycles through the list if the instance count exceeds the number of subnets.
 
 ## Create the Terraform State Bucket
 

@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "ec2_plan_github_assume_role" {
 
       # GitHub OIDC immutable subject format
       values = [
-        "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:ref:refs/heads/${var.ec2_github_dev_branch}"]
+      "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:ref:refs/heads/${var.ec2_github_dev_branch}"]
     }
   }
 }

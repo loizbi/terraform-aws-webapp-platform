@@ -18,17 +18,17 @@ data "aws_iam_policy_document" "ec2_apply_github_assume_role" {
 
     # The request must come from the specified GitHub repository & branch
     condition {
-      test = "StringLike"
+      test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      
+
       # GitHub OIDC immutable subject format
       values = [
-      "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:ref:refs/heads/${var.ec2_github_prod_branch}",
-      
-      "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:${var.ec2_github_prod_env}"
+        "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:ref:refs/heads/${var.ec2_github_prod_branch}",
+
+        "repo:${var.ec2_github_org}@${var.ec2_github_owner_id}/${var.ec2_github_repo_name}@${var.ec2_github_repo_id}:${var.ec2_github_prod_env}"
       ]
 
-      
+
     }
   }
 }

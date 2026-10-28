@@ -35,7 +35,7 @@ variable "ec2_github_owner_id" {
   description = "EC2 - GitHub repository owner ID"
   type        = string
 }
-  
+
 variable "ec2_github_prod_branch" {
   description = "EC2 - GitHub production branch name"
   type        = string

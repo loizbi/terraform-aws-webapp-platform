@@ -5,8 +5,8 @@ domain      = "loizbi-example.com"
 team        = "devops"
 
 # Resource-specific variables
-aws_region         = "eu-west-2"
-vpc_id             = "vpc-072c8eb4b4859fce4"
+aws_region = "eu-west-2"
+vpc_id     = "vpc-072c8eb4b4859fce4"
 subnet_ids = [
   "subnet-0ea09907731a8f24d", # AZ-2a
   "subnet-09edddea6a0098dff", # AZ-2b
@@ -24,3 +24,5 @@ ec2_allowed_ips = [
   "1.1.1.1/32",
   "2.2.2.2/32"
 ]
+
+# Force rebuild

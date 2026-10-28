@@ -9,8 +9,8 @@ resource "aws_instance" "webserver" {
   vpc_security_group_ids = [
     aws_security_group.ec2_security_group[count.index].id
   ]
-  
-subnet_id = var.subnet_ids[count.index % length(var.subnet_ids)]
+
+  subnet_id = var.subnet_ids[count.index % length(var.subnet_ids)]
 
   # Enable encryption for the root block device
   root_block_device {

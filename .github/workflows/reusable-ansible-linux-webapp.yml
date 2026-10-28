@@ -52,9 +52,15 @@ jobs:
           RUNNER_CIDR="${RUNNER_IP}/32"
           echo "runner_cidr=$RUNNER_CIDR" >> "$GITHUB_OUTPUT"
 
-          aws ec2 authorize-security-group-ingress \
-            --group-id "$SECURITY_GROUP_ID" \
-            --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+          #aws ec2 authorize-security-group-ingress \
+          #  --group-id "$SECURITY_GROUP_ID" \
+          #  --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+
+          while IFS= read -r group_id; do
+            aws ec2 authorize-security-group-ingress \
+              --group-id "$group_id" \
+              --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+          done < <(jq -r '.[]' <<< "$SECURITY_GROUP_ID")
 
       - name: Install Ansible
         run: |
@@ -66,7 +72,11 @@ jobs:
             TARGET_HOST: ${{ inputs.target_host }}
         run: |
           mkdir -p ansible/inventory
-          printf '[linux_ubuntu]\n%s\n' "$TARGET_HOST" > ansible/inventory/hosts.ini
+          #printf '[linux_ubuntu]\n%s\n' "$TARGET_HOST" > ansible/inventory/hosts.ini
+          {
+            printf '[linux_ubuntu]\n'
+            jq -r '.[]' <<< "$TARGET_HOST"
+          } > ansible/inventory/hosts.ini
 
       - name: Show inventory
         run: |
@@ -97,6 +107,12 @@ jobs:
           SECURITY_GROUP_ID: ${{ inputs.security_group_id }}
           RUNNER_CIDR: ${{ steps.allow_ssh.outputs.runner_cidr }}
         run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id "$SECURITY_GROUP_ID" \
-            --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+          #aws ec2 revoke-security-group-ingress \
+          #  --group-id "$SECURITY_GROUP_ID" \
+          #  --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+
+          while IFS= read -r group_id; do
+            aws ec2 revoke-security-group-ingress \
+              --group-id "$group_id" \
+              --protocol tcp --port 22 --cidr "$RUNNER_CIDR"
+          done < <(jq -r '.[]' <<< "$SECURITY_GROUP_ID")

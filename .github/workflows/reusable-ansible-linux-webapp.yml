@@ -88,9 +88,8 @@ jobs:
         env:
           TARGET_HOST: ${{ inputs.target_host }}
         run: |
-          #ansible-playbook -i ansible/linux-deploy-inventory.ini ansible/linux-deploy-web.yml
           ansible-playbook -i ansible/inventory/hosts.ini \
-          ansible/linux-deploy-web.yml
+          ansible/linux-deploy-nginx.yml
       
       - name: Remove SSH access for this runner
         if: ${{ always() && steps.allow_ssh.outputs.runner_cidr != '' }}
